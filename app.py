@@ -17,14 +17,17 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess the image (modify based on your model's preprocessing steps)
-    # Example: Convert the image to a numpy array
+    # Preprocess the image
+    # Resize the image to match the expected input shape of the model
+    image = image.resize((256, 256))
+    # Convert the image to a numpy array
     image_array = np.array(image)
-    # Add more preprocessing steps as needed
+    # Normalize the pixel values (optional but often necessary)
+    image_array = image_array / 255.0
 
     # Make predictions using the loaded model
-    prediction = model.predict(image_array.reshape(1, -1))[0]
+    prediction = model.predict(np.expand_dims(image_array, axis=0))[0]
 
     # Display the prediction
     class_labels = ['Healthy', 'Early Blight', 'Late Blight']
-    st.write(f"Prediction: {class_labels[prediction]}")
+    st.write(f"Prediction: {class_labels[np.argmax(prediction)]}")
